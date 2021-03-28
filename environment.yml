@@ -1,0 +1,21 @@
+name: ffn-env
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - absl-py
+  - cudatoolkit=9.0
+  - cudnn=7.1
+  - google-cloud-sdk
+  - h5py
+  - jupyterlab<3.0
+  - jupyterlab-nvdashboard
+  - numpy
+  - pillow
+  - pip
+  - python=3.6
+  - scikit-image
+  - scipy
+  - tensorflow-gpu=1.5

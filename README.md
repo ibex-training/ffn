@@ -13,16 +13,43 @@ This is not an official Google product.
 
 # Installation
 
-No installation is required. To install the necessary dependencies, run:
+You can create the Conda environment required to run this code by using the following command 
+to launch a job on the Ibex cluster via Slurm.
 
-```shell
-  pip install -r requirements.txt
+```bash
+sbatch bin/create-conda-env.sbatch
 ```
 
-The code has been tested on an Ubuntu 16.04.3 LTS system equipped with a
-Tesla P100 GPU.
+# Obtaining the data
+
+We provide a sample coordinate file for the FIB-25 `validation1` volume
+included in `third_party`. Due to its size, that file is hosted in
+Google Cloud Storage. Google Cloud SDK, which is already installed in the 
+Conda environment, can be used to download the data files. If you haven't 
+used it before, you will need to set it up by running the following command.
+
+```bash
+gcloud auth application-default login
+```
+
+You will be given a link to copy and paste into your browser which will 
+then given you a code that you will need to copy and paste back into 
+terminal when prompted.
+
+Once initialized, you can create a local copy of the required data files 
+with the following command.
+
+```bash
+gsutil rsync -r gs://ffn-flyem-fib25/ third_party/neuroproof_examples
 
 # Training
+
+The entire data preparation, training, and inference pipeline can be 
+launched on the Ibex cluster via Slurm with the following command.
+
+```bash
+./bin/launch-pipeline.sh
+```
 
 FFN networks can be trained with the `train.py` script, which expects a
 TFRecord file of coordinates at which to sample data from input volumes.
@@ -41,41 +68,24 @@ set to `(fov_size // 2) + deltas` (where `fov_size` and `deltas` are
 FFN model settings). Every such quantized fraction is called a *partition*.
 Sample invocation:
 
-```shell
-  python compute_partitions.py \
+```bash
+python compute_partitions.py \
     --input_volume third_party/neuroproof_examples/validation_sample/groundtruth.h5:stack \
     --output_volume third_party/neuroproof_examples/validation_sample/af.h5:af \
     --thresholds 0.025,0.05,0.075,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9 \
     --lom_radius 24,24,24 \
     --min_size 10000
 ```
-
+ 
 `build_coordinates.py` uses the partition volume from the previous step
 to produce a TFRecord file of coordinates in which every partition is
 represented approximately equally frequently. Sample invocation:
 
-```shell
-  python build_coordinates.py \
+```bash
+python build_coordinates.py \
      --partition_volumes validation1:third_party/neuroproof_examples/validation_sample/af.h5:af \
      --coordinate_output third_party/neuroproof_examples/validation_sample/tf_record_file \
      --margin 24,24,24
-```
-
-## Sample data
-
-We provide a sample coordinate file for the FIB-25 `validation1` volume
-included in `third_party`. Due to its size, that file is hosted in
-Google Cloud Storage. If you haven't used it before, you will need to
-install the Google Cloud SDK and set it up with:
-
-```shell
-  gcloud auth application-default login
-```
-
-You will also need to create a local copy of the labels and image with:
-
-```shell
-  gsutil rsync -r -x ".*.gz" gs://ffn-flyem-fib25/ third_party/neuroproof_examples
 ```
 
 ## Running training
