@@ -41,6 +41,7 @@ with the following command.
 
 ```bash
 gsutil rsync -r gs://ffn-flyem-fib25/ third_party/neuroproof_examples
+```
 
 # Training
 
@@ -76,6 +77,12 @@ python compute_partitions.py \
     --lom_radius 24,24,24 \
     --min_size 10000
 ```
+
+This stage of the pipline can be launched individually using the following command.
+
+```bash
+sbatch bin/compute-partitions.sbatch
+```
  
 `build_coordinates.py` uses the partition volume from the previous step
 to produce a TFRecord file of coordinates in which every partition is
@@ -88,12 +95,18 @@ python build_coordinates.py \
      --margin 24,24,24
 ```
 
+This stage of the pipline can be launched individually using the following command.
+
+```bash
+sbatch bin/build-coordinates.sbatch
+```
+
 ## Running training
 
 Once the coordinate files are ready, you can start training the FFN with:
 
-```shell
-  python train.py \
+```bash
+python train.py \
     --train_coords gs://ffn-flyem-fib25/validation_sample/fib_flyem_validation1_label_lom24_24_24_part14_wbbox_coords-*-of-00025.gz \
     --data_volumes validation1:third_party/neuroproof_examples/validation_sample/grayscale_maps.h5:raw \
     --label_volumes validation1:third_party/neuroproof_examples/validation_sample/groundtruth.h5:stack \
@@ -101,6 +114,12 @@ Once the coordinate files are ready, you can start training the FFN with:
     --model_args "{\"depth\": 12, \"fov_size\": [33, 33, 33], \"deltas\": [8, 8, 8]}" \
     --image_mean 128 \
     --image_stddev 33
+```
+
+This stage of the pipline can be launched individually using the following command.
+
+```bash
+sbatch bin/train.sbatch
 ```
 
 Note that both training and inference with the provided model are
@@ -126,14 +145,21 @@ For a non-interactive setting, you can use the `run_inference.py` script:
 ```
 
 which will segment the `training_sample2` volume and save the results in
-the `results/fib25/training2` directory. Two files will be produced:
-`seg-0_0_0.npz` and `seg-0_0_0.prob`. Both are in the `npz` format and
-contain a segmentation map and quantized probability maps, respectively.
-In Python, you can load the segmentation as follows:
+the `results/fib25/training2` directory. 
+
+This stage of the pipline can be launched individually using the following command.
+
+```bash
+sbatch bin/run-inference.sbatch
+```
+
+Two files will be produced: `seg-0_0_0.npz` and `seg-0_0_0.prob`. Both are in the 
+`npz` format and contain a segmentation map and quantized probability maps, 
+respectively. In Python, you can load the segmentation as follows:
 
 ```python
-  from ffn.inference import storage
-  seg, _ = storage.load_segmentation('results/fib25/training2', (0, 0, 0))
+from ffn.inference import storage
+seg, _ = storage.load_segmentation('results/fib25/training2', (0, 0, 0))
 ```
 
 We provide sample segmentation results in `results/fib25/sample-training2.npz`.
