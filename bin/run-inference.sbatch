@@ -15,10 +15,10 @@ set -e
 
 # define project environment variables
 PROJECT_DIR="$PWD"
+ENV_PREFIX="$PROJECT_DIR"/env
 
 # activate the conda environment
 module purge
-ENV_PREFIX="$PROJECT_DIR"/env
 conda activate $ENV_PREFIX
 
 # use srun to launch NVDashboard server in order to reserve a port
