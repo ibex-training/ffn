@@ -10,12 +10,19 @@
 #SBATCH --output=bin/%x-%j-slurm.out
 #SBATCH --error=bin/%x-%j-slurm.err
 
+# whole script fails if any particular line fails
+set -e
+
+# define some important environment variables
+export PROJECT_DIR="$PWD"
+export DATA_DIR="$PROJECT_DIR"/third_party/neuroproof_examples/validation_sample
+export ENV_PREFIX="$PROJECT_DIR"/env
+
 # activate the conda environment
 module purge
 conda activate $ENV_PREFIX
 
 # compute the partitions
-DATA_DIR="$PROJECT_DIR"/third_party/neuroproof_examples/validation_sample
 python compute_partitions.py \
     --input_volume "$DATA_DIR"/groundtruth.h5:stack \
     --output_volume "$DATA_DIR"/af.h5:af \
