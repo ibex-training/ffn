@@ -1,11 +1,10 @@
 #!/bin/bash
 
+# script should fail if any particular line fails
 set -e
 
-# define some important environment variables
+# script should be run from the project root directory
 export PROJECT_DIR="$PWD"
-export DATA_DIR="$PROJECT_DIR"/third_party/neuroproof_examples/validation_sample
-export ENV_PREFIX="$PROJECT_DIR"/env
 
 # first stage of the pipeline computes the partitions
 COMPUTE_PARTITIONS_JOBID=$(sbatch \
